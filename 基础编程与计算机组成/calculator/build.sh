@@ -1,0 +1,1 @@
+g++ main.cpp stack.cpp getop.cpp getch.cpp -o calculator
