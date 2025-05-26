@@ -3,16 +3,15 @@
 #include <stdlib.h>
 #include "studentbase.h"
 
-int loadData(FILE *studentData){
+int loadData(char lines[][MAXLENGTH], int total_lines){
     char c;
     char *name;
     char *number;
     char *Chinese;
     char *Math;
     char *English;
-    char buf[100];
     int line = 0;
-    while (fgets(buf, sizeof(buf), studentData)) {
+    while (line < total_lines) {
         char name[32] = {0};
         char number[16] = {0};
         char Chinese[8] = {0}, Math[8] = {0}, English[8] = {0};
@@ -20,18 +19,18 @@ int loadData(FILE *studentData){
         int field = 0;
         int pos[5] = {0};
 
-        for (int i = 0; buf[i] != '\0' && buf[i] != '\n'; i++) {
-            if (buf[i] == '/') {
+        for (int i = 0; lines[line][i] != '\0' && lines[line][i] != '\n'; i++) {
+            if (lines[line][i] == '/') {
                 field++;
                 continue;
             }
 
             switch (field) {
-                case 0: name[pos[0]++] = buf[i]; break;
-                case 1: number[pos[1]++] = buf[i]; break;
-                case 2: Chinese[pos[2]++] = buf[i]; break;
-                case 3: Math[pos[3]++] = buf[i]; break;
-                case 4: English[pos[4]++] = buf[i]; break;
+                case 0: name[pos[0]++] = lines[line][i]; break;
+                case 1: number[pos[1]++] = lines[line][i]; break;
+                case 2: Chinese[pos[2]++] = lines[line][i]; break;
+                case 3: Math[pos[3]++] = lines[line][i]; break;
+                case 4: English[pos[4]++] = lines[line][i]; break;
             }
         }
         name[pos[0]] = '\0';
@@ -45,10 +44,6 @@ int loadData(FILE *studentData){
         if(test = NULL) {printf("install student information failed."); return 0;}
     }
     return 1;
-}
-
-int editStudentInformation(char *name, char *number, char *Chinese, char *Math, char *English){
-
 }
 
 int addStudent(){

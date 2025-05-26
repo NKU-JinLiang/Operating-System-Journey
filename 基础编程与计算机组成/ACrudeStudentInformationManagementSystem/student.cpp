@@ -2,16 +2,6 @@
 #include <stdlib.h>
 #include "studentbase.h"
 
-struct studentNode { /* table entry: */
-    struct studentNode *next; /* next entry in chain */
-    char *name; /* student name */
-    char *number; /* student number */
-    int Chinese; /* Chinese grade */
-    int Math; /* Math grade */
-    int English; /* English grade */
-    int line; /* record the data position in file */
-};
-
 /* hash: form hash value for string s */
 unsigned hash(char *s)
 {

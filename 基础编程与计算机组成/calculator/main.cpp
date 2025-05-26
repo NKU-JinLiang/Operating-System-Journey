@@ -9,6 +9,7 @@ main()
 {
     int type;
     double op2;
+    double op1;
     char s[MAXOP];
     while ((type = getop(s)) != EOF) {
         switch (type) {
@@ -34,8 +35,9 @@ main()
                 break;
             case '%':
                 op2 = pop();
+                op1 = pop();
                 if (op2 != 0.0)
-                    push((double)((int)(pop() / op2)));
+                    push((double)((op1- (int)(op1 / op2)*op2)));
                 else
                     printf("error: zero divisor\n");
                 break;
