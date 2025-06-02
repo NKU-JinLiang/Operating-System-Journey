@@ -1,0 +1,1 @@
+#define MAXVAL 100 /* maximum depth of structures */
