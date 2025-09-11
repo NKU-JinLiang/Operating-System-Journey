@@ -24,11 +24,16 @@
 	mov byte [gs:0x07],0xA4 
 	mov byte [gs:0x08],'R' 
 	mov byte [gs:0x09],0xA4 
-	mov eax,LOADER_START_SECTOR ; 起始扇区 lba 地址
-	mov bx,LOADER_BASE_ADDR ; 写入的地址
-	mov cx,1 ; 待读入的扇区数
- 	call rd_disk_m_16 ; 以下读取程序的起始部分(一个扇区) 
-	jmp LOADER_BASE_ADDR
+	; --- 在调用 rd_disk_m_16 之前加 ---
+	xor ax, ax
+	mov ds, ax
+	mov es, ax    ; 以防后面要用 ES:DI 的形式
+	; -------------------------------
+	mov eax, LOADER_START_SECTOR
+	mov bx,  LOADER_BASE_ADDR   ; 0x600
+	mov cx,  4
+	call rd_disk_m_16
+	jmp  LOADER_BASE_ADDR       ; 跳到 0x0000:0x0600
 
 rd_disk_m_16:
 	mov esi,eax ;备份 eax 
