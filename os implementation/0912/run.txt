@@ -1,0 +1,12 @@
+nasm -f bin mbr.S -o mbr.bin
+nasm -f bin loader.S -o loader.bin
+# 先生成一个空盘镜像 (100 个扇区)
+dd if=/dev/zero of=os.img bs=512 count=100
+
+# 写入 mbr.bin 到第 0 扇区
+dd if=mbr.bin of=os.img conv=notrunc
+
+# 写入 loader.bin 到第 2 扇区 (跳过前 2 个扇区)
+dd if=loader.bin of=os.img seek=2 conv=notrunc
+
+qemu-system-i386 -drive format=raw,file=os.img
