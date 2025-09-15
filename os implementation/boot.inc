@@ -1,11 +1,10 @@
 ;------------------- 进入loader所需要的宏 --------------------------
-
-LOADER_START_SECTOR equ 2
-LOADER_BASE_ADDR equ 0x600 ;
+LOADER_BASE_ADDR equ 0x900 
+LOADER_START_SECTOR equ 0x2
 
 ;-------------------- gdt描述符属性 --------------------------------
 
-DESC_G_4K equ 1_00000000000000000000000b ;第23位G 表示4K或者1MB位 段界限的单位值 此时为1则为4k 
+DESC_G_4K equ 1_00000000000000000000000b; 第23位G 表示4K或者1MB位 段界限的单位值 此时为1则为4k 
 DESC_D_32 equ 1_0000000000000000000000b  ;第22位D/B位 表示地址值用32位EIP寄存器 操作数与指令码32位
 DESC_L    equ 0_000000000000000000000b   ;第21位 设置成0表示不设置成64位代码段 忽略
 DESC_AVL  equ 0_00000000000000000000b    ;第20位 是软件可用的 操作系统额外提供的 可不设置
@@ -45,7 +44,7 @@ DESC_P + DESC_DPL_0 + DESC_S_DATA + DESC_TYPE_DATA + 0X00
 ;显存段描述符高位4字节初始ua
 DESC_VIDEO_HIGH4   equ (0x00<<24) + DESC_G_4K + DESC_D_32 + \
 DESC_L + DESC_AVL + DESC_LIMIT_VIDEO2 + \
-DESC_P + DESC_DPL_0 + DESC_S_DATA + DESC_TYPE_DATA + 0X0B  ;
+DESC_P + DESC_DPL_0 + DESC_S_DATA + DESC_TYPE_DATA + 0X00
 
 ;-------------------- 选择子属性 --------------------------------
 ;第0-1位 RPL 特权级比较是否允许访问  第2位TI 0表示GDT 1表示LDT    第3-15位索引值

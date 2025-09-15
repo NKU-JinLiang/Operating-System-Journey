@@ -4,3 +4,34 @@ dd if=/dev/zero of=os.img bs=512 count=100
 dd if=mbr.bin of=os.img conv=notrunc
 dd if=loader.bin of=os.img seek=2 conv=notrunc
 qemu-system-i386 -drive format=raw,file=os.img
+
+
+##挂起方式运行
+qemu-system-i386 -drive format=raw,file=os.img -S -s
+
+
+##gdb链接并开始debug
+target remote :1234
+set architecture i8086
+b *0x7c00
+c
+
+hbreak *0x7c00    # 在绝对地址 0x7c00 设置断点
+info breakpoints # 查看所有断点及编号
+delete N         # 删除编号为 N 的断点
+disable N        # 临时禁用编号为 N 的断点
+enable N         # 重新启用编号为 N 的断点
+
+info registers   # 显示寄存器内容
+x/10i $eip       # 从当前 EIP 开始反汇编 10 条指令
+x/16bx 0x900     # 查看 0x900 起始的 16 个字节（十六进制、逐字节）
+x/16i 0x900      # 从 0x900 开始反汇编 16 条指令
+
+实模式（16位）：
+
+set architecture i8086
+
+
+保护模式（32位）：
+
+set architecture i386
