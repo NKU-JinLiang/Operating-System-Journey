@@ -23,9 +23,9 @@ disable N        # 临时禁用编号为 N 的断点
 enable N         # 重新启用编号为 N 的断点
 
 info registers   # 显示寄存器内容
-x/10i $eip       # 从当前 EIP 开始反汇编 10 条指令
-x/16bx 0x900     # 查看 0x900 起始的 16 个字节（十六进制、逐字节）
-x/16i 0x900      # 从 0x900 开始反汇编 16 条指令
+x/40i $eip       # 从当前 EIP 开始反汇编 10 条指令
+x/16bx 0x7E00     # 查看 0x900 起始的 16 个字节（十六进制、逐字节）
+x/16i 0x7E00      # 从 0x900 开始反汇编 16 条指令
 
 实模式（16位）：
 
@@ -35,3 +35,5 @@ set architecture i8086
 保护模式（32位）：
 
 set architecture i386
+
+xxd -l 2048 os.img | less

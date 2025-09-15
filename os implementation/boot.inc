@@ -1,5 +1,5 @@
 ;------------------- 进入loader所需要的宏 --------------------------
-LOADER_BASE_ADDR equ 0x900 
+LOADER_BASE_ADDR equ 0x7E00
 LOADER_START_SECTOR equ 0x2
 
 ;-------------------- gdt描述符属性 --------------------------------

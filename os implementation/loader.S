@@ -1,6 +1,5 @@
 %include "boot.inc"
-[org 0x900]
-LOADER_STACK_TOP equ 0x9FC00
+section loader vstart=LOADER_BASE_ADDR
 jmp loader_start	   ;下面存放数据段 构建gdt 跳跃到下面的代码区
 GDT_BASE: dd 0x00000000 
 	dd 0x00000000 
@@ -12,7 +11,7 @@ VIDEO_DESC: dd 0x80000007;limit=(0xbffff-0xb8000)/4k=0x7
 	dd DESC_VIDEO_HIGH4 ;此时 dpl 为 0 
 GDT_SIZE equ $ - GDT_BASE 
 GDT_LIMIT equ GDT_SIZE - 1 
-times 60 dq 0 ; 此处预留 60 个描述符的空位
+times 30 dq 0 ; 此处预留 60 个描述符的空位
 SELECTOR_CODE equ (0x0001<<3) + TI_GDT + RPL0 
 SELECTOR_DATA equ (0x0002<<3) + TI_GDT + RPL0 ; 同上
 SELECTOR_VIDEO equ (0x0003<<3) + TI_GDT + RPL0 ; 同上
