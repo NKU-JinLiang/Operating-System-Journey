@@ -11,7 +11,7 @@ VIDEO_DESC: dd 0x80000007;limit=(0xbffff-0xb8000)/4k=0x7
 	dd DESC_VIDEO_HIGH4 ;此时 dpl 为 0 
 GDT_SIZE equ $ - GDT_BASE 
 GDT_LIMIT equ GDT_SIZE - 1 
-times 40 dq 0 ; 此处预留 50 个描述符的空位
+times 60 dq 0 ; 此处预留 60 个描述符的空位
 SELECTOR_CODE equ (0x0001<<3) + TI_GDT + RPL0 
 SELECTOR_DATA equ (0x0002<<3) + TI_GDT + RPL0 ; 同上
 SELECTOR_VIDEO equ (0x0003<<3) + TI_GDT + RPL0 ; 同上
@@ -30,3 +30,29 @@ mov ax, 0x1301 ; AH = 13, AL = 01h
 mov bx, 0x001f ; 页号为 0(BH = 0) 蓝底粉红字(BL = 1fh) 
 mov dx, 0x1800 
 int 0x10 ; 10h 号中断
+;----------------- 打开 A20 ----------------
+in al,0x92
+or al,0000_0010B
+out 0x92,al
+lgdt [gdt_ptr]
+
+;----------------- cr0 第 0 位置 1 ---------------- 
+mov eax, cr0 
+or eax, 0x00000001 
+mov cr0, eax 
+
+jmp dword SELECTOR_CODE:p_mode_start ; 刷新流水线
+
+[bits 32] 
+p_mode_start: 
+mov ax, SELECTOR_DATA 
+mov ds, ax 
+mov es, ax 
+mov ss, ax 
+mov esp,LOADER_STACK_TOP 
+mov ax, SELECTOR_VIDEO 
+mov gs, ax 
+
+mov byte [gs:160], 'P' 
+
+jmp $

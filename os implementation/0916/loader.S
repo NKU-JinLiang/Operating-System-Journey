@@ -11,7 +11,7 @@ VIDEO_DESC: dd 0x80000007;limit=(0xbffff-0xb8000)/4k=0x7
 	dd DESC_VIDEO_HIGH4 ;此时 dpl 为 0 
 GDT_SIZE equ $ - GDT_BASE 
 GDT_LIMIT equ GDT_SIZE - 1 
-times 70 dq 0 ; 此处预留 50 个描述符的空位
+times 60 dq 0 ; 此处预留 60 个描述符的空位
 SELECTOR_CODE equ (0x0001<<3) + TI_GDT + RPL0 
 SELECTOR_DATA equ (0x0002<<3) + TI_GDT + RPL0 ; 同上
 SELECTOR_VIDEO equ (0x0003<<3) + TI_GDT + RPL0 ; 同上
