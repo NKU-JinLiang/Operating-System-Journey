@@ -49,14 +49,13 @@ mov byte [gs:0x09],0xA4
 
 mov eax,LOADER_START_SECTOR ; 起始扇区 lba 地址
 mov bx,LOADER_BASE_ADDR ; 写入的地址
-mov cx,1; 待读入的扇区数
+mov cx,2; 待读入的扇区数
+
+.read_loop:
 call rd_disk_m_16 ; 以下读取程序的起始部分(一个扇区) 
-mov eax,LOADER_START_SECTOR ; 起始扇区 lba 地址
 add eax, 1
-mov bx,LOADER_BASE_ADDR ; 写入的地址
-add bx, 512
-mov cx,1; 待读入的扇区数
-call rd_disk_m_16 ; 以下读取程序的起始部分(一个扇区) 
+loop .read_loop
+
 jmp LOADER_BASE_ADDR 
 
 ;------------------------------------------------------------------------------- 
@@ -71,7 +70,7 @@ mov di,cx ;备份 cx
 ;读写硬盘: 
 ;第 1 步:设置要读取的扇区数
 mov dx,0x1f2 
-mov al,cl 
+mov al,1
 out dx,al ;读取的扇区数
 
 mov eax,esi ;恢复 ax 
@@ -115,18 +114,15 @@ cmp al,0x08
 jnz .not_ready ;若未准备好,继续等
  
 ;第 5 步:从 0x1f0 端口读数据
-mov ax, di 
-mov dx, 256 
-mul dx 
-mov cx, ax 
-; di 为要读取的扇区数,一个扇区有 512 字节,每次读入一个字
-; 共需 di*512/2 次,所以 di*256 
+mov cx, 256 
 mov dx, 0x1f0 
 .go_on_read: 
 in ax,dx 
 mov [bx],ax 
 add bx,2 
-loop .go_on_read 
+loop .go_on_read
+mov cx,di ;还原 cx 
+mov eax,esi ;恢复 ax
 ret 
  
 times 510-($-$$) db 0 
