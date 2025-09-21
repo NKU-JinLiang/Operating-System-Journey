@@ -49,7 +49,7 @@ mov byte [gs:0x09],0xA4
 
 mov eax,LOADER_START_SECTOR ; 起始扇区 lba 地址
 mov bx,LOADER_BASE_ADDR ; 写入的地址
-mov cx,2; 待读入的扇区数
+mov cx,3; 待读入的扇区数
 
 .read_loop:
 call rd_disk_m_16 ; 以下读取程序的起始部分(一个扇区) 
