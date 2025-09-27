@@ -1,7 +1,8 @@
 ;------------------- 进入loader所需要的宏 --------------------------
 LOADER_BASE_ADDR equ 0x7E00
 LOADER_START_SECTOR equ 0x2
-
+;------------- loader 和 kernel ----------
+PAGE_DIR_TABLE_POS equ 0x100000
 ;-------------------- gdt描述符属性 --------------------------------
 
 DESC_G_4K equ (1 << 23)  ; 第 23 位 = 1
@@ -27,7 +28,7 @@ DESC_CODE_HIGH4 equ (0x00 << 24) + DESC_G_4K + DESC_D_32 + DESC_L + DESC_AVL + D
 
 DESC_DATA_HIGH4 equ (0x00 << 24) + DESC_G_4K + DESC_D_32 +DESC_L + DESC_AVL + DESC_LIMIT_DATA + DESC_P + DESC_DPL_0 + DESC_S_DATA + DESC_TYPE_DATA + 0x00 
 
-DESC_VIDEO_HIGH4 equ (0x00 << 24) + DESC_G_4K + DESC_D_32 +DESC_L + DESC_AVL + DESC_LIMIT_VIDEO + DESC_P + DESC_DPL_0 + DESC_S_DATA + DESC_TYPE_DATA + 0x00 
+DESC_VIDEO_HIGH4 equ (0x00 << 24) + DESC_G_4K + DESC_D_32 +DESC_L + DESC_AVL + DESC_LIMIT_VIDEO + DESC_P + DESC_DPL_0 + DESC_S_DATA + DESC_TYPE_DATA + 0x0B 
 ;-------------- 选择子属性 --------------- 
 RPL0 equ 00b 
 RPL1 equ 01b 
@@ -35,3 +36,9 @@ RPL2 equ 10b
 RPL3 equ 11b 
 TI_GDT equ 000b 
 TI_LDT equ 100b
+;---------------- 页表相关属性 -------------- 
+PG_P equ 1b 
+PG_RW_R equ 00b 
+PG_RW_W equ 10b 
+PG_US_S equ 000b 
+PG_US_U equ 100b
