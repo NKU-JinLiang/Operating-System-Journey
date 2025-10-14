@@ -9,6 +9,9 @@ qemu-system-i386 -drive format=raw,file=os.img -m 4096
 ##挂起方式运行
 qemu-system-i386 -drive format=raw,file=os.img  -m 4096 -S -s
 
+##编译内核
+gcc -m32 -c kernel/main.c -o kernel/main.o
+ld -m elf_i386 -Ttext 0xC0001500 -e main -o kernel/kernel.elf kernel/main.o
 
 ##gdb链接并开始debug
 target remote :1234
