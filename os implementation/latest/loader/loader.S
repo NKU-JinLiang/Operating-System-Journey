@@ -84,6 +84,11 @@ mov esp,LOADER_STACK_TOP
 mov ax, SELECTOR_VIDEO 
 mov gs, ax 
 
+mov eax, KERNEL_START_SECTOR ; kernel.bin 所在的扇区号
+mov ebx, KERNEL_BIN_BASE_ADDR ; 从磁盘读出后，写入到 ebx 指定的地址
+mov ecx, 200 ; 读入的扇区数
+call rd_disk_m_32
+
 mov byte [gs:160], 'P' 
 ; 创建页目录及页表并初始化页内存位图
 call setup_page 
@@ -168,3 +173,69 @@ setup_page:
     add eax, 0x1000 
     loop .create_kernel_pde 
     ret
+;------------------------------------------------------------------------------- 
+;功能:读取硬盘 n 个扇区
+rd_disk_m_32: 
+;------------------------------------------------------------------------------- 
+; eax=LBA 扇区号
+; ebx=将数据写入的内存地址
+; ecx=读入的扇区数
+mov esi,eax ;备份 eax 
+mov di,cx ;备份 cx 
+;读写硬盘: 
+;第 1 步:设置要读取的扇区数
+mov dx,0x1f2 
+mov al,1
+out dx,al ;读取的扇区数
+
+mov eax,esi ;恢复 ax 
+
+;第 2 步:将 LBA 地址存入 0x1f3 ～ 0x1f6 
+
+;LBA 地址 7～0 位写入端口 0x1f3 
+mov dx,0x1f3 
+out dx,al 
+
+;LBA 地址 15～8 位写入端口 0x1f4 
+mov cl,8 
+shr eax,cl 
+mov dx,0x1f4 
+out dx,al 
+
+;LBA 地址 23～16 位写入端口 0x1f5 
+shr eax,cl 
+mov dx,0x1f5 
+out dx,al 
+
+shr eax,cl 
+and al,0x0f ;lba 第 24～27 位
+or al,0xe0 ; 设置 7～4 位为 1110,表示 lba 模式
+mov dx,0x1f6 
+out dx,al
+
+;第 3 步:向 0x1f7 端口写入读命令,0x20 
+mov dx,0x1f7 
+mov al,0x20 
+out dx,al 
+
+;第 4 步:检测硬盘状态
+.not_ready: 
+;同一端口,写时表示写入命令字,读时表示读入硬盘状态
+nop 
+in al,dx 
+and al,0x88 ;第 4 位为 1 表示硬盘控制器已准备好数据传输
+ ;第 7 位为 1 表示硬盘忙
+cmp al,0x08 
+jnz .not_ready ;若未准备好,继续等
+ 
+;第 5 步:从 0x1f0 端口读数据
+mov cx, 256 
+mov dx, 0x1f0 
+.go_on_read: 
+in ax,dx 
+mov [bx],ax 
+add bx,2 
+loop .go_on_read
+mov cx,di ;还原 cx 
+mov eax,esi ;恢复 ax
+ret 

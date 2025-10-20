@@ -40,6 +40,7 @@ set architecture i8086
 set architecture i386
 
 xxd -l 2048 os.img | less
+xxd -g 1 -s 4608 -l 512 os.img | less
 
 0x00000 ───────────────────────────────
         | 中断向量表 (IVT)              |
