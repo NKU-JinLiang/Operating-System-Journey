@@ -1,6 +1,6 @@
 %include "boot.inc"
 section loader vstart=LOADER_BASE_ADDR
-LOADER_STACK_TOP equ 0x9FC00
+LOADER_STACK_TOP equ 0x90000
 jmp loader_start	   ;下面存放数据段 构建gdt 跳跃到下面的代码区
 GDT_BASE: dd 0x00000000 
 	dd 0x00000000 
@@ -83,13 +83,17 @@ mov ss, ax
 mov esp,LOADER_STACK_TOP 
 mov ax, SELECTOR_VIDEO 
 mov gs, ax 
-
-mov eax, KERNEL_START_SECTOR ; kernel.bin 所在的扇区号
-mov ebx, KERNEL_BIN_BASE_ADDR ; 从磁盘读出后，写入到 ebx 指定的地址
-mov ecx, 200 ; 读入的扇区数
-call rd_disk_m_32
-
 mov byte [gs:160], 'P' 
+
+;mov eax, KERNEL_START_SECTOR ; kernel.bin 所在的扇区号
+;mov ebx, KERNEL_BIN_BASE_ADDR ; 从磁盘读出后，写入到 ebx 指定的地址
+;mov ecx,  1; 读入的扇区数
+
+;.read_loop:
+;    call rd_disk_m_32 ; 以下读取程序的起始部分(一个扇区) 
+;    add eax, 1
+;    loop .read_loop
+
 ; 创建页目录及页表并初始化页内存位图
 call setup_page 
 
@@ -173,6 +177,7 @@ setup_page:
     add eax, 0x1000 
     loop .create_kernel_pde 
     ret
+
 ;------------------------------------------------------------------------------- 
 ;功能:读取硬盘 n 个扇区
 rd_disk_m_32: 
@@ -181,7 +186,7 @@ rd_disk_m_32:
 ; ebx=将数据写入的内存地址
 ; ecx=读入的扇区数
 mov esi,eax ;备份 eax 
-mov di,cx ;备份 cx 
+mov edi,ecx ;备份 cx 
 ;读写硬盘: 
 ;第 1 步:设置要读取的扇区数
 mov dx,0x1f2 
@@ -220,22 +225,22 @@ out dx,al
 
 ;第 4 步:检测硬盘状态
 .not_ready: 
-;同一端口,写时表示写入命令字,读时表示读入硬盘状态
-nop 
-in al,dx 
-and al,0x88 ;第 4 位为 1 表示硬盘控制器已准备好数据传输
- ;第 7 位为 1 表示硬盘忙
-cmp al,0x08 
-jnz .not_ready ;若未准备好,继续等
+    ;同一端口,写时表示写入命令字,读时表示读入硬盘状态
+    nop 
+    in al,dx 
+    and al,0x88 ;第 4 位为 1 表示硬盘控制器已准备好数据传输
+    ;第 7 位为 1 表示硬盘忙
+    cmp al,0x08 
+    jnz .not_ready ;若未准备好,继续等
  
 ;第 5 步:从 0x1f0 端口读数据
-mov cx, 256 
+mov ecx, 256 
 mov dx, 0x1f0 
 .go_on_read: 
-in ax,dx 
-mov [bx],ax 
-add bx,2 
+    in ax,dx 
+    mov [ebx],ax 
+    add ebx,2 
 loop .go_on_read
-mov cx,di ;还原 cx 
+mov ecx,edi ;还原 cx 
 mov eax,esi ;恢复 ax
 ret 

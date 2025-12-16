@@ -1,5 +1,5 @@
-nasm -f bin mbr.S -o mbr.bin
-nasm -f bin loader.S -o loader.bin
+nasm -f bin loader/mbr.S -o mbr.bin
+nasm -f bin loader/loader.S -o loader.bin
 dd if=/dev/zero of=os.img bs=512 count=100
 dd if=mbr.bin of=os.img conv=notrunc
 dd if=loader.bin of=os.img seek=2 conv=notrunc
@@ -12,7 +12,7 @@ qemu-system-i386 -drive format=raw,file=os.img  -m 4096 -S -s
 ##编译内核
 gcc -m32 -c kernel/main.c -o kernel/main.o
 ld -m elf_i386 -Ttext 0xC0001500 -e main -o kernel/kernel.elf kernel/main.o
-
+dd if=kernel/kernel.elf of=os.img bs=512 seek=9 conv=notrunc
 ##gdb链接并开始debug
 target remote :1234
 set architecture i8086
@@ -63,7 +63,9 @@ xxd -g 1 -s 4608 -l 512 os.img | less
         | 其它可用空间                  |
         | 可以继续放第二阶段代码        |
 ...     ───────────────────────────────
-0x9FC00 ───────────────────────────────
+0x70000 ───────────────────────────────
+        | 加载内核代码                |
+0x90000 ───────────────────────────────
         | 栈顶 (推荐放这里)             |
         | 向下增长，不会覆盖 Loader     |
 0xA0000 ───────────────────────────────

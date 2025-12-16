@@ -3,7 +3,7 @@ LOADER_BASE_ADDR equ 0x7E00
 LOADER_START_SECTOR equ 0x2
 ;------------- loader 和 kernel ----------
 PAGE_DIR_TABLE_POS equ 0x100000
-KERNEL_START_SECTOR equ 9
+KERNEL_START_SECTOR equ 0x9
 KERNEL_BIN_BASE_ADDR equ 0x70000
 ;-------------------- gdt描述符属性 --------------------------------
 
